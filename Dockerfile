@@ -1,9 +1,13 @@
-FROM node:16.18.1 as build
+FROM node:16-alpine3.16 as build
 WORKDIR /app
-COPY package*.json ./
+COPY ./package*.json ./
+
 RUN npm ci
-COPY . .
+
+COPY ./ ./
 RUN npm run build
-FROM nginx:1.19
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-COPY --from=build /app/dist/book-management-system/ /usr/share/nginx/html
+
+FROM nginx:1.23.0-alpine
+EXPOSE 8080
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=build /app/dist/ngcloudrundemo /usr/share/nginx/html
